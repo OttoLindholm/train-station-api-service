@@ -1,4 +1,3 @@
-from django.contrib.postgres.fields.array.ArrayField import model
 from django.db import models
 
 from train_station_service import settings
