@@ -1,4 +1,7 @@
+from django.contrib.postgres.fields.array.ArrayField import model
 from django.db import models
+
+from train_station_service import settings
 
 
 class Crew(models.Model):
@@ -62,3 +65,24 @@ class Trip(models.Model):
 
     def __str__(self):
         return f"{self.train.name} ({self.route})"
+
+
+class Order(models.Model):
+    created = models.DateTimeField(auto_now_add=True)
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE
+    )
+
+
+class Ticket(models.Model):
+    cargo = model.IntegerField()
+    seat = model.IntegerField()
+    trip = models.ForeignKey(
+        Trip, on_delete=models.CASCADE, related_name="tickets"
+    )
+    order = models.ForeignKey(
+        Order, on_delete=models.CASCADE
+    )
+
+    def __str__(self):
+        return f"{self.trip} (cargo: {self.cargo}, seat: {self.seat})"
