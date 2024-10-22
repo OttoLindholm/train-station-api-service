@@ -74,8 +74,8 @@ class Order(models.Model):
 
 
 class Ticket(models.Model):
-    cargo = model.IntegerField()
-    seat = model.IntegerField()
+    cargo = models.IntegerField()
+    seat = models.IntegerField()
     trip = models.ForeignKey(
         Trip, on_delete=models.CASCADE, related_name="tickets"
     )
