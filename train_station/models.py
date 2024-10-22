@@ -48,3 +48,17 @@ class Route(models.Model):
 
     def __str__(self):
         return f"{self.source.name}-{self.destination.name}"
+
+
+class Trip(models.Model):
+    route = models.ForeignKey(
+        Route, on_delete=models.CASCADE, related_name="trips"
+    )
+    train = models.ForeignKey(
+        Train, on_delete=models.CASCADE, related_name="trips"
+    )
+    departure_time = models.DateTimeField()
+    arrival_time = models.DateTimeField()
+
+    def __str__(self):
+        return f"{self.train.name} ({self.route})"
