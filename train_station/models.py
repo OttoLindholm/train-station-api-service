@@ -72,7 +72,7 @@ class Crew(models.Model):
 
 
 class Order(models.Model):
-    created = models.DateTimeField(auto_now_add=True)
+    created_at = models.DateTimeField(auto_now_add=True)
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL, on_delete=models.CASCADE
     )
@@ -85,7 +85,7 @@ class Ticket(models.Model):
         Trip, on_delete=models.CASCADE, related_name="tickets"
     )
     order = models.ForeignKey(
-        Order, on_delete=models.CASCADE
+        Order, on_delete=models.CASCADE, related_name="tickets"
     )
 
     def __str__(self):
