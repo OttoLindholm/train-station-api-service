@@ -3,7 +3,9 @@ from rest_framework import serializers
 from train_station.models import (
     Crew,
     Train,
-    Station, Route,
+    Station,
+    Route,
+    Trip,
 )
 
 
@@ -30,8 +32,8 @@ class StationSerializer(serializers.ModelSerializer):
 
 
 class RouteSerializer(serializers.ModelSerializer):
-    source = StationSerializer(allow_empty=False)
-    destination = StationSerializer(allow_empty=False)
+    source = StationSerializer()
+    destination = StationSerializer()
 
     class Meta:
         model = Route
@@ -44,4 +46,17 @@ class RouteListSerializer(RouteSerializer):
     )
     destination = serializers.CharField(
         source="destination.name", read_only=True
+    )
+
+
+class TripSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Trip
+        fields = ("id", "route", "train", "departure_time", "arrival_time")
+
+
+class TripListSerializer(TripSerializer):
+    route = RouteListSerializer(read_only=True)
+    train = serializers.CharField(
+        source="train.name", read_only=True
     )
