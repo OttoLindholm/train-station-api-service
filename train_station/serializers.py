@@ -5,7 +5,7 @@ from train_station.models import (
     Train,
     Station,
     Route,
-    Trip,
+    Trip, Ticket, Order,
 )
 
 
@@ -62,3 +62,17 @@ class CrewSerializer(serializers.ModelSerializer):
     class Meta:
         model = Crew
         fields = ("id", "first_name", "last_name", "trips", "full_name",)
+
+
+class TicketSerializer(serializers.ModelSerializer):
+    route = RouteListSerializer(source="trip.route", read_only=True)
+
+    class Meta:
+        model = Ticket
+        fields = ("id", "cargo", "seat", "route")
+
+
+class TicketSeatsSerializer(TicketSerializer):
+    class Meta:
+        model = Ticket
+        fields = ("cargo", "seat")
