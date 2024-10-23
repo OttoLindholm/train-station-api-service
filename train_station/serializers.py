@@ -9,12 +9,6 @@ from train_station.models import (
 )
 
 
-class CrewSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Crew
-        fields = ("id", "first_name", "last_name", "full_name",)
-
-
 class TrainSerializer(serializers.ModelSerializer):
     train_type = serializers.CharField(
         source="train_type.name", read_only=True
@@ -60,3 +54,11 @@ class TripListSerializer(TripSerializer):
     train = serializers.CharField(
         source="train.name", read_only=True
     )
+
+
+class CrewSerializer(serializers.ModelSerializer):
+    trips = TripListSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Crew
+        fields = ("id", "first_name", "last_name", "trips", "full_name",)
