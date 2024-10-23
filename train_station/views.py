@@ -3,13 +3,21 @@ from rest_framework import viewsets
 from train_station.models import (
     Train,
     Station,
-    Route, Trip, Crew, Order,
+    Route,
+    Trip,
+    Crew,
+    Order,
 )
 from train_station.serializers import (
     TrainSerializer,
     StationSerializer,
     RouteSerializer,
-    RouteListSerializer, TripSerializer, TripListSerializer, CrewSerializer, OrderSerializer, OrderListSerializer,
+    RouteListSerializer,
+    TripSerializer,
+    TripListSerializer,
+    CrewSerializer,
+    OrderSerializer,
+    OrderListSerializer,
 )
 
 
