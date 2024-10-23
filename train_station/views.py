@@ -3,14 +3,19 @@ from rest_framework import viewsets
 from train_station.models import (
     Train,
     Station,
-    Route, Trip,
+    Route, Trip, Crew,
 )
 from train_station.serializers import (
     TrainSerializer,
     StationSerializer,
     RouteSerializer,
-    RouteListSerializer, TripSerializer, TripListSerializer,
+    RouteListSerializer, TripSerializer, TripListSerializer, CrewSerializer,
 )
+
+
+class CrewViewSet(viewsets.ModelViewSet):
+    queryset = Crew.objects.prefetch_related("trips").all()
+    serializer_class = CrewSerializer
 
 
 class TrainViewSet(viewsets.ModelViewSet):
