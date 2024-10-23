@@ -65,14 +65,22 @@ class CrewSerializer(serializers.ModelSerializer):
 
 
 class TicketSerializer(serializers.ModelSerializer):
-    route = RouteListSerializer(source="trip.route", read_only=True)
-
     class Meta:
         model = Ticket
-        fields = ("id", "cargo", "seat", "route")
+        fields = ("id", "cargo", "seat", "trip")
 
 
-class TicketSeatsSerializer(TicketSerializer):
+class TicketListSerializer(TicketSerializer):
+    trip = TripListSerializer(read_only=True)
+
+
+class OrderSerializer(serializers.ModelSerializer):
+    tickets = TicketListSerializer(many=True)
+
     class Meta:
-        model = Ticket
-        fields = ("cargo", "seat")
+        model = Order
+        fields = ("id", "created_at", "tickets")
+
+
+class OrderListSerializer(OrderSerializer):
+    tickets = TicketListSerializer(many=True, read_only=True)
