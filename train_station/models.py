@@ -40,6 +40,9 @@ class Route(models.Model):
     )
     distance = models.IntegerField()
 
+    class Meta:
+        ordering = ["source", "destination"]
+
     def __str__(self):
         return f"{self.source.name} to {self.destination.name}"
 
