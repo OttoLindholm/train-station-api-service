@@ -41,7 +41,7 @@ class Route(models.Model):
     distance = models.IntegerField()
 
     def __str__(self):
-        return f"{self.source.name}-{self.destination.name}"
+        return f"{self.source.name} to {self.destination.name}"
 
 
 class Trip(models.Model):
@@ -51,7 +51,7 @@ class Trip(models.Model):
     arrival_time = models.DateTimeField()
 
     def __str__(self):
-        return f"{self.train.name} ({self.route})"
+        return f"{self.route} ({self.train})"
 
 
 class Crew(models.Model):
