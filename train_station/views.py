@@ -1,3 +1,4 @@
+from django.db.models import F, Count
 from rest_framework import viewsets
 
 from train_station.models import (
@@ -19,16 +20,17 @@ from train_station.serializers import (
     CrewSerializer,
     OrderSerializer,
     OrderListSerializer,
+    TripDetailSerializer,
 )
 
 
 class CrewViewSet(viewsets.ModelViewSet):
-    queryset = Crew.objects.prefetch_related("trips").all()
+    queryset = Crew.objects.prefetch_related("trips")
     serializer_class = CrewSerializer
 
 
 class TrainViewSet(viewsets.ModelViewSet):
-    queryset = Train.objects.select_related("train_type").all()
+    queryset = Train.objects.select_related("train_type")
     serializer_class = TrainSerializer
 
 
@@ -38,7 +40,7 @@ class StationViewSet(viewsets.ModelViewSet):
 
 
 class RouteViewSet(viewsets.ModelViewSet):
-    queryset = Route.objects.select_related("source", "destination").all()
+    queryset = Route.objects.select_related("source", "destination")
     serializer_class = RouteSerializer
 
     def get_serializer_class(self):
@@ -51,17 +53,26 @@ class RouteViewSet(viewsets.ModelViewSet):
 
 
 class TripViewSet(viewsets.ModelViewSet):
-    queryset = Trip.objects.select_related("train", "route").all()
+    queryset = Trip.objects.select_related(
+        "route", "train", "route__source", "route__destination", "train__train_type"
+    ).annotate(
+        tickets_available=(
+            F("train__cargo_num") * F("train__places_in_cargo") - Count("tickets")
+        )
+    )
     serializer_class = TripSerializer
 
     def get_serializer_class(self):
         if self.action == "list":
             return TripListSerializer
+
+        if self.action == "retrieve":
+            return TripDetailSerializer
         return TripSerializer
 
 
 class OrderViewSet(viewsets.ModelViewSet):
-    queryset = Order.objects.prefetch_related("tickets").all()
+    queryset = Order.objects.prefetch_related("tickets")
     serializer_class = OrderSerializer
 
     def get_serializer_class(self):

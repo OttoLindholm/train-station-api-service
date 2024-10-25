@@ -44,19 +44,41 @@ class RouteListSerializer(RouteSerializer):
 
 
 class RouteDetailSerializer(RouteSerializer):
-    source = StationSerializer()
-    destination = StationSerializer()
+    source = StationSerializer(read_only=True)
+    destination = StationSerializer(read_only=True)
 
 
 class TripSerializer(serializers.ModelSerializer):
+    route = serializers.PrimaryKeyRelatedField(
+        queryset=Route.objects.select_related("source", "destination"),
+    )
+    train = serializers.PrimaryKeyRelatedField(
+        queryset=Train.objects.select_related("train_type"),
+    )
+    departure_time = serializers.DateTimeField(format="%Y-%m-%d %H:%M")
+    arrival_time = serializers.DateTimeField(format="%Y-%m-%d %H:%M")
+    tickets_available = serializers.IntegerField(read_only=True)
+
     class Meta:
         model = Trip
-        fields = ("id", "route", "train", "departure_time", "arrival_time")
+        fields = (
+            "id",
+            "route",
+            "train",
+            "departure_time",
+            "arrival_time",
+            "tickets_available",
+        )
 
 
 class TripListSerializer(TripSerializer):
+    route = serializers.StringRelatedField(read_only=True)
+    train = serializers.StringRelatedField(read_only=True)
+
+
+class TripDetailSerializer(TripSerializer):
     route = RouteListSerializer(read_only=True)
-    train = serializers.CharField(source="train.name", read_only=True)
+    train = TrainSerializer(read_only=True)
 
 
 class CrewSerializer(serializers.ModelSerializer):
