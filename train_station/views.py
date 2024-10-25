@@ -57,7 +57,7 @@ class TripViewSet(viewsets.ModelViewSet):
 
 
 class OrderViewSet(viewsets.ModelViewSet):
-    queryset = Order.objects.select_related("tickets").all()
+    queryset = Order.objects.prefetch_related("tickets").all()
     serializer_class = OrderSerializer
 
     def get_serializer_class(self):
