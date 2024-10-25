@@ -46,6 +46,17 @@ class Route(models.Model):
     def __str__(self):
         return f"{self.source.name} to {self.destination.name}"
 
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        if not Route.objects.filter(
+            source=self.destination, destination=self.source
+        ).exists():
+            Route.objects.get_or_create(
+                source=self.destination,
+                destination=self.source,
+                defaults={"distance": self.distance},
+            )
+
 
 class Trip(models.Model):
     route = models.ForeignKey(Route, on_delete=models.CASCADE, related_name="trips")
