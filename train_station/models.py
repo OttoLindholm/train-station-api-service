@@ -48,14 +48,12 @@ class Route(models.Model):
 
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
-        if not Route.objects.filter(
-            source=self.destination, destination=self.source
-        ).exists():
-            Route.objects.get_or_create(
-                source=self.destination,
-                destination=self.source,
-                defaults={"distance": self.distance},
-            )
+
+        Route.objects.get_or_create(
+            source=self.destination,
+            destination=self.source,
+            defaults={"distance": self.distance},
+        )
 
 
 class Trip(models.Model):
