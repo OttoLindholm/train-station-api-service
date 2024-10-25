@@ -26,8 +26,12 @@ class StationSerializer(serializers.ModelSerializer):
 
 
 class RouteSerializer(serializers.ModelSerializer):
-    source = StationSerializer()
-    destination = StationSerializer()
+    source = serializers.PrimaryKeyRelatedField(
+        queryset=Station.objects.all(),
+    )
+    destination = serializers.PrimaryKeyRelatedField(
+        queryset=Station.objects.all(),
+    )
 
     class Meta:
         model = Route
@@ -37,6 +41,11 @@ class RouteSerializer(serializers.ModelSerializer):
 class RouteListSerializer(RouteSerializer):
     source = serializers.CharField(source="source.name", read_only=True)
     destination = serializers.CharField(source="destination.name", read_only=True)
+
+
+class RouteDetailSerializer(RouteSerializer):
+    source = StationSerializer()
+    destination = StationSerializer()
 
 
 class TripSerializer(serializers.ModelSerializer):

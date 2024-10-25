@@ -13,6 +13,7 @@ from train_station.serializers import (
     StationSerializer,
     RouteSerializer,
     RouteListSerializer,
+    RouteDetailSerializer,
     TripSerializer,
     TripListSerializer,
     CrewSerializer,
@@ -43,6 +44,9 @@ class RouteViewSet(viewsets.ModelViewSet):
     def get_serializer_class(self):
         if self.action == "list":
             return RouteListSerializer
+
+        if self.action == "retrieve":
+            return RouteDetailSerializer
         return RouteSerializer
 
 
