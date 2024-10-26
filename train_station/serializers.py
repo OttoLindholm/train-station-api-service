@@ -1,3 +1,4 @@
+from django.core.exceptions import ValidationError
 from rest_framework import serializers
 
 from train_station.models import (
@@ -38,6 +39,19 @@ class RouteSerializer(serializers.ModelSerializer):
     class Meta:
         model = Route
         fields = ("id", "source", "destination", "distance")
+
+    def validate(self, data):
+        if data["source"] == data["destination"]:
+            raise serializers.ValidationError(
+                "Source and destination stations cannot be the same."
+            )
+
+        if data["distance"] <= 0:
+            raise serializers.ValidationError(
+                "Distance must be a positive value."
+            )
+
+        return data
 
 
 class RouteListSerializer(RouteSerializer):
