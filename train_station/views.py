@@ -54,10 +54,15 @@ class RouteViewSet(viewsets.ModelViewSet):
 
 class TripViewSet(viewsets.ModelViewSet):
     queryset = Trip.objects.select_related(
-        "route", "train", "route__source", "route__destination", "train__train_type"
+        "route",
+        "train",
+        "route__source",
+        "route__destination",
+        "train__train_type",
     ).annotate(
         tickets_available=(
-            F("train__cargo_num") * F("train__places_in_cargo") - Count("tickets")
+            F("train__cargo_num") * F("train__places_in_cargo")
+            - Count("tickets")
         )
     )
     serializer_class = TripSerializer

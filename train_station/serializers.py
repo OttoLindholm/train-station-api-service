@@ -12,7 +12,9 @@ from train_station.models import (
 
 
 class TrainSerializer(serializers.ModelSerializer):
-    train_type = serializers.CharField(source="train_type.name", read_only=True)
+    train_type = serializers.CharField(
+        source="train_type.name", read_only=True
+    )
 
     class Meta:
         model = Train
@@ -40,7 +42,9 @@ class RouteSerializer(serializers.ModelSerializer):
 
 class RouteListSerializer(RouteSerializer):
     source = serializers.CharField(source="source.name", read_only=True)
-    destination = serializers.CharField(source="destination.name", read_only=True)
+    destination = serializers.CharField(
+        source="destination.name", read_only=True
+    )
 
 
 class RouteDetailSerializer(RouteSerializer):

@@ -24,7 +24,10 @@ from train_station_service import settings
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-    path("api/v1/train-station/", include("train_station.urls", namespace="train-station")),
+    path(
+        "api/v1/train-station/",
+        include("train_station.urls", namespace="train-station"),
+    ),
     # path("api/v1/user/", include("user.urls", namespace="user")),
     path("api/v1/schema/", SpectacularAPIView.as_view(), name="schema"),
     path(
