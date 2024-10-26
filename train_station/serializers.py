@@ -1,4 +1,4 @@
-from django.core.exceptions import ValidationError
+from django.db import transaction
 from rest_framework import serializers
 
 from train_station.models import (
@@ -29,7 +29,6 @@ class StationSerializer(serializers.ModelSerializer):
 
 
 class RouteSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = Route
         fields = ("id", "source", "destination", "distance")
@@ -131,6 +130,14 @@ class OrderSerializer(serializers.ModelSerializer):
     class Meta:
         model = Order
         fields = ("id", "created_at", "tickets")
+
+    def create(self, validated_data):
+        with transaction.atomic():
+            tickets_data = validated_data.pop("tickets")
+            order = Order.objects.create(**validated_data)
+            for ticket_data in tickets_data:
+                Ticket.objects.create(order=order, **ticket_data)
+            return order
 
 
 class OrderListSerializer(OrderSerializer):
