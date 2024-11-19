@@ -1,5 +1,5 @@
 from django.db.models import F, Count
-from rest_framework import viewsets
+from rest_framework import viewsets, mixins
 
 from train_station.models import (
     Train,
@@ -25,7 +25,11 @@ from train_station.serializers import (
 )
 
 
-class CrewViewSet(viewsets.ModelViewSet):
+class CrewViewSet(
+    mixins.CreateModelMixin,
+    mixins.ListModelMixin,
+    viewsets.GenericViewSet,
+):
     queryset = Crew.objects.prefetch_related(
         "trips__route__source",
         "trips__route__destination",
@@ -39,17 +43,30 @@ class CrewViewSet(viewsets.ModelViewSet):
         return CrewSerializer
 
 
-class TrainViewSet(viewsets.ModelViewSet):
+class TrainViewSet(
+    mixins.CreateModelMixin,
+    mixins.ListModelMixin,
+    viewsets.GenericViewSet,
+):
     queryset = Train.objects.select_related("train_type")
     serializer_class = TrainSerializer
 
 
-class StationViewSet(viewsets.ModelViewSet):
+class StationViewSet(
+    mixins.CreateModelMixin,
+    mixins.ListModelMixin,
+    viewsets.GenericViewSet,
+):
     queryset = Station.objects.all()
     serializer_class = StationSerializer
 
 
-class RouteViewSet(viewsets.ModelViewSet):
+class RouteViewSet(
+    mixins.CreateModelMixin,
+    mixins.ListModelMixin,
+    mixins.RetrieveModelMixin,
+    viewsets.GenericViewSet,
+):
     queryset = Route.objects.select_related("source", "destination")
     serializer_class = RouteSerializer
 
@@ -84,7 +101,11 @@ class TripViewSet(viewsets.ModelViewSet):
         return TripSerializer
 
 
-class OrderViewSet(viewsets.ModelViewSet):
+class OrderViewSet(
+    mixins.CreateModelMixin,
+    mixins.ListModelMixin,
+    viewsets.GenericViewSet,
+):
     queryset = Order.objects.prefetch_related("tickets")
     serializer_class = OrderSerializer
 
