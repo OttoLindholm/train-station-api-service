@@ -1,5 +1,6 @@
 from django.db.models import F, Count
 from rest_framework import viewsets, mixins
+from rest_framework.permissions import IsAuthenticated
 
 from train_station.models import (
     Train,
@@ -9,6 +10,7 @@ from train_station.models import (
     Crew,
     Order,
 )
+from train_station.permissions import IsAdminOrIfAuthenticatedReadOnly
 from train_station.serializers import (
     TrainSerializer,
     StationSerializer,
@@ -36,6 +38,7 @@ class CrewViewSet(
         "trips__train__train_type",
     )
     serializer_class = CrewSerializer
+    permission_classes = (IsAdminOrIfAuthenticatedReadOnly,)
 
     def get_serializer_class(self):
         if self.action == "list":
@@ -50,6 +53,7 @@ class TrainViewSet(
 ):
     queryset = Train.objects.select_related("train_type")
     serializer_class = TrainSerializer
+    permission_classes = (IsAdminOrIfAuthenticatedReadOnly,)
 
 
 class StationViewSet(
@@ -69,6 +73,7 @@ class RouteViewSet(
 ):
     queryset = Route.objects.select_related("source", "destination")
     serializer_class = RouteSerializer
+    permission_classes = (IsAdminOrIfAuthenticatedReadOnly,)
 
     def get_serializer_class(self):
         if self.action == "list":
@@ -91,6 +96,7 @@ class TripViewSet(viewsets.ModelViewSet):
         )
     )
     serializer_class = TripSerializer
+    permission_classes = (IsAdminOrIfAuthenticatedReadOnly,)
 
     def get_serializer_class(self):
         if self.action == "list":
@@ -108,6 +114,7 @@ class OrderViewSet(
 ):
     queryset = Order.objects.prefetch_related("tickets")
     serializer_class = OrderSerializer
+    permission_classes = (IsAuthenticated,)
 
     def get_serializer_class(self):
         if self.action == "list":
