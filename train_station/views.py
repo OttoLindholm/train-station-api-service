@@ -63,6 +63,8 @@ class StationViewSet(
 ):
     queryset = Station.objects.all()
     serializer_class = StationSerializer
+    permission_classes = (IsAdminOrIfAuthenticatedReadOnly,)
+
 
 
 class RouteViewSet(
