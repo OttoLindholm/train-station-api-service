@@ -111,16 +111,18 @@ class AuthenticatedTests(TestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_cannot_create_station(self):
+        data = {"name": "New Station", "latitude": 10.0, "longitude": 20.0}
         response = self.client.post(
             STATION_LIST_URL,
-            {"name": "New Station", "latitude": 10.0, "longitude": 20.0},
+            data=data,
         )
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
     def test_can_create_order(self):
+        data = {"tickets": [{"seat": 1, "cargo": 1, "trip": sample_trip().id}]}
         response = self.client.post(
             ORDER_LIST_URL,
-            {"tickets": [{"seat": 1, "cargo": 1, "trip": sample_trip().id}]},
+            data=data,
             format="json",
         )
         self.assertEqual(
@@ -142,9 +144,10 @@ class AdminTests(TestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_can_create_station(self):
+        data = {"name": "Admin Station", "latitude": 10.0, "longitude": 20.0}
         response = self.client.post(
             STATION_LIST_URL,
-            {"name": "Admin Station", "latitude": 10.0, "longitude": 20.0},
+            data=data,
         )
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
@@ -157,13 +160,14 @@ class AdminTests(TestCase):
         destination = sample_station(
             name="Destination", latitude=60.0, longitude=40.0
         )
+        data = {
+            "source": source.id,
+            "destination": destination.id,
+            "distance": 15,
+        }
         response = self.client.post(
             ROUTE_LIST_URL,
-            {
-                "source": source.id,
-                "destination": destination.id,
-                "distance": 15,
-            },
+            data=data,
         )
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
@@ -174,13 +178,14 @@ class AdminTests(TestCase):
     def test_can_create_trip(self):
         route = sample_route()
         train = sample_train()
+        data = {
+            "route": route.id,
+            "train": train.id,
+            "departure_time": "2024-11-19 22:00:00",
+            "arrival_time": "2024-11-20 22:00:00",
+        }
         response = self.client.post(
             TRIP_LIST_URL,
-            {
-                "route": route.id,
-                "train": train.id,
-                "departure_time": "2024-11-19 22:00:00",
-                "arrival_time": "2024-11-20 22:00:00",
-            },
+            data=data,
         )
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
