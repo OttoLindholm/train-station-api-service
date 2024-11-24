@@ -99,6 +99,24 @@ class TripViewSet(viewsets.ModelViewSet):
     serializer_class = TripSerializer
     permission_classes = (IsAdminOrIfAuthenticatedReadOnly,)
 
+    def get_queryset(self):
+        train = self.request.query_params.get("train")
+        source = self.request.query_params.get("source")
+        destination = self.request.query_params.get("destination")
+
+        queryset = self.queryset
+
+        if train:
+            queryset = queryset.filter(train__name__icontains=train)
+
+        if source:
+            queryset = queryset.filter(route__source__name__icontains=source)
+
+        if destination:
+            queryset = queryset.filter(route__destination__name__icontains=destination)
+
+        return queryset.distinct()
+
     def get_serializer_class(self):
         if self.action == "list":
             return TripListSerializer
