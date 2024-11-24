@@ -7,7 +7,7 @@ from rest_framework import status
 from django.contrib.auth import get_user_model
 from django.utils.timezone import make_aware
 
-from train_station.models import TrainType, Train, Station, Route, Trip
+from train_station.models import TrainType, Train, Station, Route, Trip, Order
 
 
 CREW_LIST_URL = reverse("train-station:crew-list")
@@ -129,6 +129,7 @@ class AuthenticatedTests(TestCase):
             response.status_code,
             status.HTTP_201_CREATED,
         )
+        self.assertEqual(Order.objects.all().count(), 1)
 
 
 class AdminTests(TestCase):
@@ -150,6 +151,7 @@ class AdminTests(TestCase):
             data=data,
         )
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(Station.objects.all().count(), 1)
 
     def test_can_access_route_list(self):
         response = self.client.get(ROUTE_LIST_URL)
@@ -170,6 +172,7 @@ class AdminTests(TestCase):
             data=data,
         )
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(Route.objects.all().count(), 2)
 
     def test_can_access_trip_list(self):
         response = self.client.get(TRIP_LIST_URL)
@@ -189,3 +192,4 @@ class AdminTests(TestCase):
             data=data,
         )
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(Trip.objects.all().count(), 1)
