@@ -66,7 +66,6 @@ class StationViewSet(
     permission_classes = (IsAdminOrIfAuthenticatedReadOnly,)
 
 
-
 class RouteViewSet(
     mixins.CreateModelMixin,
     mixins.ListModelMixin,
@@ -114,7 +113,11 @@ class OrderViewSet(
     mixins.ListModelMixin,
     viewsets.GenericViewSet,
 ):
-    queryset = Order.objects.prefetch_related("tickets")
+    queryset = Order.objects.prefetch_related(
+        "tickets__trip__train__train_type",
+        "tickets__trip__route__source",
+        "tickets__trip__route__destination",
+    )
     serializer_class = OrderSerializer
     permission_classes = (IsAuthenticated,)
 
