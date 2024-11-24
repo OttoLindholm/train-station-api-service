@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from django.db.models import F, Count
 from rest_framework import viewsets, mixins
 from rest_framework.permissions import IsAuthenticated
@@ -103,6 +105,8 @@ class TripViewSet(viewsets.ModelViewSet):
         train = self.request.query_params.get("train")
         source = self.request.query_params.get("source")
         destination = self.request.query_params.get("destination")
+        departure_date = self.request.query_params.get("departure")
+        arrival_date = self.request.query_params.get("arrival")
 
         queryset = self.queryset
 
@@ -113,7 +117,17 @@ class TripViewSet(viewsets.ModelViewSet):
             queryset = queryset.filter(route__source__name__icontains=source)
 
         if destination:
-            queryset = queryset.filter(route__destination__name__icontains=destination)
+            queryset = queryset.filter(
+                route__destination__name__icontains=destination
+            )
+
+        if departure_date:
+            date = datetime.strptime(departure_date, "%Y-%m-%d").date()
+            queryset = queryset.filter(departure_time__date=date)
+
+        if arrival_date:
+            date = datetime.strptime(arrival_date, "%Y-%m-%d").date()
+            queryset = queryset.filter(arrival_time__date=date)
 
         return queryset.distinct()
 
