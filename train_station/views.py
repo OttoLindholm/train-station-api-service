@@ -3,7 +3,10 @@ from datetime import datetime
 from django.db.models import F, Count
 from rest_framework import viewsets, mixins
 from rest_framework.permissions import IsAuthenticated
+from drf_spectacular.types import OpenApiTypes
+from drf_spectacular.utils import extend_schema, OpenApiParameter
 
+from train_station.permissions import IsAdminOrIfAuthenticatedReadOnly
 from train_station.models import (
     Train,
     Station,
@@ -12,7 +15,6 @@ from train_station.models import (
     Crew,
     Order,
 )
-from train_station.permissions import IsAdminOrIfAuthenticatedReadOnly
 from train_station.serializers import (
     TrainSerializer,
     StationSerializer,
@@ -138,6 +140,42 @@ class TripViewSet(viewsets.ModelViewSet):
         if self.action == "retrieve":
             return TripDetailSerializer
         return TripSerializer
+
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(
+                "train",
+                type=OpenApiTypes.STR,
+                description="Filter by Train name (ex. ?train=regional)",
+            ),
+            OpenApiParameter(
+                "source",
+                type=OpenApiTypes.STR,
+                description="Filter by source of Trip (ex. ?source=Lviv)",
+            ),
+            OpenApiParameter(
+                "destination",
+                type=OpenApiTypes.STR,
+                description="Filter by destination of Trip (ex. ?source=Dnipro)",
+            ),
+            OpenApiParameter(
+                "departure",
+                type=OpenApiTypes.DATE,
+                description=(
+                    "Filter by departure date of Trip (ex. ?date=2024-11-25)"
+                ),
+            ),
+            OpenApiParameter(
+                "arrival",
+                type=OpenApiTypes.DATE,
+                description=(
+                    "Filter by arrival date of Trip (ex. ?date=2024-11-26)"
+                ),
+            ),
+        ]
+    )
+    def list(self, request, *args, **kwargs):
+        return super().list(request, *args, **kwargs)
 
 
 class OrderViewSet(
