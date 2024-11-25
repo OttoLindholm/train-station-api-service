@@ -8,7 +8,7 @@ from django.contrib.auth import get_user_model
 from django.utils.timezone import make_aware
 
 from train_station.models import TrainType, Train, Station, Route, Trip, Order
-
+from train_station.serializers import TripListSerializer
 
 CREW_LIST_URL = reverse("train-station:crew-list")
 TRAIN_LIST_URL = reverse("train-station:train-list")
@@ -65,6 +65,12 @@ def sample_trip(**params):
     return Trip.objects.create(**defaults)
 
 
+def remove_tickets_available(data):
+    return {
+        key: value for key, value in data.items() if key != "tickets_available"
+    }
+
+
 def detail_url(view_name, pk):
     return reverse(f"train-station:{view_name}-detail", kwargs={"pk": pk})
 
@@ -117,6 +123,93 @@ class AuthenticatedTests(TestCase):
             data=data,
         )
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_filter_trip_by_train(self):
+        trip1 = sample_trip(train=sample_train(name="Train 1"))
+        trip2 = sample_trip(train=sample_train(name="Train 2"))
+        trip3 = sample_trip(train=sample_train(name="Else"))
+
+        res = self.client.get(TRIP_LIST_URL, {"train": "train"})
+
+        serializer1 = TripListSerializer(trip1)
+        serializer2 = TripListSerializer(trip2)
+        serializer3 = TripListSerializer(trip3)
+        res_data = [remove_tickets_available(item) for item in res.data]
+
+        self.assertIn(serializer1.data, res_data)
+        self.assertIn(serializer2.data, res_data)
+        self.assertNotIn(serializer3.data, res_data)
+
+    def test_filter_trip_by_source_or_destination(self):
+        trip1 = sample_trip(
+            route=sample_route(
+                source=sample_station(name="Station 1"),
+                destination=sample_station(name="Station 1"),
+            )
+        )
+        trip2 = sample_trip(
+            route=sample_route(
+                source=sample_station(name="Station 2"),
+                destination=sample_station(name="Station 2"),
+            )
+        )
+        trip3 = sample_trip(
+            route=sample_route(
+                source=sample_station(name="Else"),
+                destination=sample_station(name="Else"),
+            )
+        )
+
+        serializer1 = TripListSerializer(trip1)
+        serializer2 = TripListSerializer(trip2)
+        serializer3 = TripListSerializer(trip3)
+
+        res = self.client.get(TRIP_LIST_URL, {"source": "station"})
+        res_data = [remove_tickets_available(item) for item in res.data]
+
+        self.assertIn(serializer1.data, res_data)
+        self.assertIn(serializer2.data, res_data)
+        self.assertNotIn(serializer3.data, res_data)
+
+        res = self.client.get(TRIP_LIST_URL, {"destination": "station"})
+        res_data = [remove_tickets_available(item) for item in res.data]
+
+        self.assertIn(serializer1.data, res_data)
+        self.assertIn(serializer2.data, res_data)
+        self.assertNotIn(serializer3.data, res_data)
+
+    def test_filter_trip_by_date(self):
+        trip1 = sample_trip(
+            departure_time=make_aware(datetime(2024, 11, 25, 8, 0)),
+            arrival_time=make_aware(datetime(2024, 11, 26, 8, 0)),
+        )
+        trip2 = sample_trip(
+            departure_time=make_aware(datetime(2024, 11, 25, 10, 0)),
+            arrival_time=make_aware(datetime(2024, 11, 26, 10, 0)),
+        )
+
+        trip3 = sample_trip(
+            departure_time=make_aware(datetime(2024, 11, 26, 10, 0)),
+            arrival_time=make_aware(datetime(2024, 11, 27, 10, 0)),
+        )
+
+        serializer1 = TripListSerializer(trip1)
+        serializer2 = TripListSerializer(trip2)
+        serializer3 = TripListSerializer(trip3)
+
+        res = self.client.get(TRIP_LIST_URL, {"departure": "2024-11-25"})
+        res_data = [remove_tickets_available(item) for item in res.data]
+
+        self.assertIn(serializer1.data, res_data)
+        self.assertIn(serializer2.data, res_data)
+        self.assertNotIn(serializer3.data, res_data)
+
+        res = self.client.get(TRIP_LIST_URL, {"arrival": "2024-11-26"})
+        res_data = [remove_tickets_available(item) for item in res.data]
+
+        self.assertIn(serializer1.data, res_data)
+        self.assertIn(serializer2.data, res_data)
+        self.assertNotIn(serializer3.data, res_data)
 
     def test_can_create_order(self):
         data = {"tickets": [{"seat": 1, "cargo": 1, "trip": sample_trip().id}]}
