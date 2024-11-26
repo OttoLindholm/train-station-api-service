@@ -31,7 +31,9 @@ SECRET_KEY = getenv("SECRET_KEY")
 DEBUG = getenv("DEBUG", "False") == "True"
 
 ALLOWED_HOSTS = [
+    "127.0.0.1",
     "localhost",
+    "0.0.0.0",
 ]
 
 INTERNAL_IPS = [
