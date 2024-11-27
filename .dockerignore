@@ -1,0 +1,13 @@
+.github
+.gitignore
+
+.venv
+.env.sample
+.flake8
+.idea
+.db.sqlite3
+
+docker-compose.yml
+Dockerfile
+README.md
+diagram.png
